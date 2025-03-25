@@ -1,0 +1,8 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.container_label {
+  color: #d6d6d6;
+}/*# sourceMappingURL=LabelCalendar.module.css.map */

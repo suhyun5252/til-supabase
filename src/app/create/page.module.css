@@ -1,0 +1,91 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 920px;
+  height: 100vh;
+  background-color: #f9f9f9;
+  border-right: 1px solid #e6e6e6;
+}
+.container_header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  background-color: #fff;
+}
+.container_header_contents {
+  width: 100%;
+  padding: 20px 28px;
+  margin-top: 68px;
+}
+.container_header_contents .input {
+  font-size: 36px;
+  font-weight: 700;
+  outline: none;
+}
+.container_header_contents .input::-moz-placeholder {
+  color: #c4c4c4;
+}
+.container_header_contents .input::placeholder {
+  color: #c4c4c4;
+}
+.container_header_contents .progressBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin: 8px 0 16px 0;
+}
+.container_header_contents .progressBar_status {
+  color: #6d6d6d;
+  font-size: 14px;
+}
+.container_header_contents .calendarBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.container_header_contents .calendarBox_calendar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.container_body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  height: calc(100vh - 250px);
+  padding: 28px 16px;
+}
+.container_body_infoBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.container_body_infoBox .title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #454545;
+}
+.container_body_infoBox .subTitle {
+  margin: 14px 0 28px 0;
+  font-size: 18px;
+  color: #454545;
+}
+.container_body_infoBox .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}/*# sourceMappingURL=page.module.css.map */
