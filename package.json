@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-types": "npx supabase gen types typescript --project-id isdytdgwjbmfqnavbqfw --schema public > src/types/types_db.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.1.4",
@@ -15,6 +16,8 @@
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-separator": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.2",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.3",
     "@uiw/react-md-editor": "^4.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -39,6 +42,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "prettier": "^3.5.3",
     "sass": "^1.86.0",
+    "supabase": "^2.19.7",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

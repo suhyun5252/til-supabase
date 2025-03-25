@@ -9,53 +9,20 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      todo: {
+      todos: {
         Row: {
-          completed: boolean
-          content: string
-          created_at: string
+          content: string | null
           id: number
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          completed: boolean
-          content: string
-          created_at?: string
-          id?: number
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          completed?: boolean
-          content?: string
-          created_at?: string
-          id?: number
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      todo_up: {
-        Row: {
-          contents: Json | null
-          end_date: string | null
-          id: number
-          start_date: string | null
           title: string | null
         }
         Insert: {
-          contents?: Json | null
-          end_date?: string | null
+          content?: string | null
           id?: number
-          start_date?: string | null
           title?: string | null
         }
         Update: {
-          contents?: Json | null
-          end_date?: string | null
+          content?: string | null
           id?: number
-          start_date?: string | null
           title?: string | null
         }
         Relationships: []
