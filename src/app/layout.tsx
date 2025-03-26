@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import SideNavigation from "@/components/common/navigation/SideNavigation";
+// shadcn/ui
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -24,6 +26,7 @@ export default function RootLayout({
       <body className={`${roboto.variable}  antialiased`}>
         <SideNavigation />
         {children}
+        <Toaster />
       </body>
     </html>
   );
