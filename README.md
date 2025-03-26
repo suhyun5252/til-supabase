@@ -733,7 +733,7 @@ function Page() {
             </span>
             <button className={styles.button} onClick={onCreateContent}>
               <Image
-                src="/images/round-button.svg"
+                src="/assets/images/round-button.svg"
                 alt="add board"
                 width={100}
                 height={100}
