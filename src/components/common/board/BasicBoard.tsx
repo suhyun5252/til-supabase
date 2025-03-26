@@ -41,12 +41,12 @@ function BasicBoard({ item, updateContent }: BasicBoardProps) {
           <LabelCalendar
             label="From"
             required={true}
-            selectedDate={item.startDate}
+            selectedDate={new Date(item.startDate)}
           />
           <LabelCalendar
             label="To"
             required={true}
-            selectedDate={item.endDate}
+            selectedDate={new Date(item.endDate)}
           />
           {/* <div className="flex items-center gap-3">
             <span className="text-[#6d6d6d]">From</span>

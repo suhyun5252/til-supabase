@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 // scss
 import styles from "@/app/create/[id]/page.module.scss";
 // action
-
+import { getTodoId, updateTodoId } from "@/app/actions/todo-actions";
 // component
 import BasicBoard from "@/components/common/board/BasicBoard";
 // shadcn/ui
@@ -15,7 +15,6 @@ import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
-import { getTodosId, updateTodosId } from "@/app/actions/todo-actions";
 
 // contents 배열에 대한 타입 정의
 interface BoardContent {
@@ -24,7 +23,7 @@ interface BoardContent {
   content: string;
   startDate: string | Date;
   endDate: string | Date;
-  boardId: string; // 랜덤한 아이디를 생성해줄 예정
+  boardId: string; // 랜던함 아이디를 생성해줄 예정
 }
 
 function Page() {
@@ -32,8 +31,8 @@ function Page() {
   // 데이터 출력 state
   const [title, setTitle] = useState<string | null>("");
   const [contents, setContents] = useState<BoardContent[]>([]);
-  const [startDate, setStarDate] = useState<string | Date>("");
-  const [endDate, setEndDate] = useState<string | Date>("");
+  const [startDate, setStarDate] = useState<undefined | Date>(new Date());
+  const [endDate, setEndDate] = useState<undefined | Date>(new Date());
 
   // 컨텐츠 데이터 업데이트 함수
   const updateContent = async (newData: BoardContent) => {
@@ -46,16 +45,17 @@ function Page() {
       return item;
     });
     // 서버에 Row 를 업데이트 합니다.
-    const { data, error, status } = await updateTodosId(
+    const { data, error, status } = await updateTodoId(
       Number(id),
       JSON.stringify(newContentArr)
     );
+
     fetchGetTodoId();
   };
 
   // id 에 해당하는 Row 데이터를 읽어오기
   const fetchGetTodoId = async () => {
-    const { data, error, status } = await getTodosId(Number(id));
+    const { data, error, status } = await getTodoId(Number(id));
     // 에러 발생시
     if (error) {
       toast.error("데이터 호출 실패", {
@@ -71,8 +71,8 @@ function Page() {
     });
 
     setTitle(data?.title ? data.title : "");
-    setStarDate(data?.start_date ? data.start_date : new Date());
-    setEndDate(data?.end_date ? data.end_date : new Date());
+    setStarDate(data?.start_date ? new Date(data.start_date) : new Date());
+    setEndDate(data?.end_date ? new Date(data.end_date) : new Date());
     const temp = data?.contents ? JSON.parse(data.contents as string) : [];
     setContents(temp);
   };
@@ -94,7 +94,7 @@ function Page() {
     const updateContent = [...contents, addContent];
     console.log("updateContent : ", updateContent);
     // 서버에 Row 를 업데이트 합니다.
-    const { data, error, status } = await updateTodosId(
+    const { data, error, status } = await updateTodoId(
       Number(id),
       JSON.stringify(updateContent)
     );
@@ -144,8 +144,16 @@ function Page() {
           {/* 캘린더 선택 추가 */}
           <div className={styles.calendarBox}>
             <div className={styles.calendarBox_calendar}>
-              <LabelCalendar label="From" required={false} />
-              <LabelCalendar label="To" required={true} />
+              <LabelCalendar
+                label="From"
+                required={false}
+                selectedDate={startDate}
+              />
+              <LabelCalendar
+                label="To"
+                required={true}
+                selectedDate={endDate}
+              />
             </div>
             <Button
               variant={"outline"}

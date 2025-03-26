@@ -35,7 +35,7 @@ export async function getTodos() {
   };
 }
 // Read 기능 id 한개
-export async function getTodosId(id: number) {
+export async function getTodoId(id: number) {
   const supabase = await createServerSideClient();
   const { data, error, status } = await supabase
     .from("todos")
@@ -50,7 +50,7 @@ export async function getTodosId(id: number) {
 }
 
 // Update 기능 id 한개
-export async function updateTodosId(id: number, contents: string) {
+export async function updateTodoId(id: number, contents: string) {
   const supabase = await createServerSideClient();
 
   const { data, error, status } = await supabase
