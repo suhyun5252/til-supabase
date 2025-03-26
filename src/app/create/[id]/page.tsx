@@ -1,28 +1,30 @@
 "use client";
-import { getTodosId, updateTodosId } from "@/app/actions/todo-actions";
-import styles from "@/app/create/[id]/page.module.scss";
-// scss
-import BasicBoard from "@/components/common/board/BasicBoard";
-//comp
-import LabelCalendar from "@/components/common/calendar/LabelCalendar";
-// shadcn
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 // nanoid
 import { nanoid } from "nanoid";
+// scss
+import styles from "@/app/create/[id]/page.module.scss";
+// action
+
+// component
+import BasicBoard from "@/components/common/board/BasicBoard";
+// shadcn/ui
+import LabelCalendar from "@/components/common/calendar/LabelCalendar";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Image from "next/image";
+import { getTodosId, updateTodosId } from "@/app/actions/todo-actions";
 
 // contents 배열에 대한 타입 정의
-export interface BoardContent {
-  boardId: string; // 랜덤한 아이디
+interface BoardContent {
   isCompleted: boolean;
   title: string;
   content: string;
   startDate: string | Date;
   endDate: string | Date;
+  boardId: string; // 랜덤한 아이디를 생성해줄 예정
 }
 
 function Page() {
@@ -30,57 +32,79 @@ function Page() {
   // 데이터 출력 state
   const [title, setTitle] = useState<string | null>("");
   const [contents, setContents] = useState<BoardContent[]>([]);
-  const [startDate, setStartDate] = useState<string | Date>("");
+  const [startDate, setStarDate] = useState<string | Date>("");
   const [endDate, setEndDate] = useState<string | Date>("");
+
+  // 컨텐츠 데이터 업데이트 함수
+  const updateContent = async (newData: BoardContent) => {
+    console.log("최종전달 ", newData);
+
+    const newContentArr = contents.map((item) => {
+      if (item.boardId === newData.boardId) {
+        return newData;
+      }
+      return item;
+    });
+    // 서버에 Row 를 업데이트 합니다.
+    const { data, error, status } = await updateTodosId(
+      Number(id),
+      JSON.stringify(newContentArr)
+    );
+    fetchGetTodoId();
+  };
+
   // id 에 해당하는 Row 데이터를 읽어오기
   const fetchGetTodoId = async () => {
     const { data, error, status } = await getTodosId(Number(id));
+    // 에러 발생시
     if (error) {
-      toast.error("데이터 조회 실패", {
-        description: `데이터 조회에 실패하였습니다. ${error.message}`,
+      toast.error("데이터 호출 실패", {
+        description: `데이터 호출에 실패하였습니다. ${error.message}`,
         duration: 3000,
       });
       return;
     }
-    // 성공시
-    toast.success("데이터 조회 성공", {
-      description: `데이터 조회에 성공하였습니다.`,
+    // 최종 데이터
+    toast.success("데이터 호출 성공", {
+      description: "데이터 호출에 성공하였습니다",
       duration: 3000,
     });
+
     setTitle(data?.title ? data.title : "");
-    setStartDate(data?.start_date ? data.start_date : new Date());
+    setStarDate(data?.start_date ? data.start_date : new Date());
     setEndDate(data?.end_date ? data.end_date : new Date());
     const temp = data?.contents ? JSON.parse(data.contents as string) : [];
     setContents(temp);
   };
 
   // 컨텐츠 추가하기
-  const onCreateContent = async () => {
-    // 기본을 추가될 내용
-    const addContents: BoardContent = {
-      boardId: nanoid(),
-      title: "",
-      content: "",
-      startDate: new Date().toISOString(),
-      endDate: new Date().toISOString(),
-      isCompleted: false,
-    };
-    const updateContent = [...contents, addContents];
-    // setContents([...contents, addContents]);
-    // console.log(contents);
-    // 서버에 Row 를 업데이트
+  const initData: BoardContent = {
+    boardId: nanoid(),
+    title: "",
+    content: "",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    isCompleted: false,
+  };
+
+  const onCreateContent = async (newData: BoardContent) => {
+    const addContent = newData;
+    // 기본으로 추가될 내용
+
+    const updateContent = [...contents, addContent];
+    console.log("updateContent : ", updateContent);
+    // 서버에 Row 를 업데이트 합니다.
     const { data, error, status } = await updateTodosId(
       Number(id),
       JSON.stringify(updateContent)
     );
+
     // 에러 발생시
     if (error) {
       toast.error("데이터 컨텐츠 업데이트 실패", {
         description: `데이터 컨텐츠 업데이트에 실패하였습니다. ${error.message}`,
         duration: 3000,
       });
-      console.log(error);
-
       return;
     }
     // 최종 데이터
@@ -89,12 +113,14 @@ function Page() {
       duration: 3000,
     });
 
-    // 자료 새로 호출
+    // 자료 새로 후출
     fetchGetTodoId();
   };
+
   useEffect(() => {
     fetchGetTodoId();
   }, []);
+
   return (
     <div className={styles.container}>
       {/* 상단 */}
@@ -124,7 +150,7 @@ function Page() {
             <Button
               variant={"outline"}
               className="w-[15%] text-white bg-orange-400 border-orange-500 hover:bg-orange-400 hover:text-white cursor-pointer"
-              onClick={onCreateContent}
+              onClick={() => onCreateContent(initData)}
             >
               Add New Board
             </Button>
@@ -140,9 +166,12 @@ function Page() {
             <span className={styles.subTitle}>
               Click the button and start flashing!
             </span>
-            <button className={styles.button} onClick={onCreateContent}>
+            <button
+              className={styles.button}
+              onClick={() => onCreateContent(initData)}
+            >
               <Image
-                src="/images/round-button.svg"
+                src="/assets/images/round-button.svg"
                 alt="add board"
                 width={100}
                 height={100}
@@ -152,7 +181,11 @@ function Page() {
         ) : (
           <div className="flex flex-col items-center justify-start w-full h-full gap-4">
             {contents.map((item) => (
-              <BasicBoard key={item.boardId} />
+              <BasicBoard
+                key={item.boardId}
+                item={item}
+                updateContent={updateContent}
+              />
             ))}
           </div>
         )}

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -18,10 +18,17 @@ import styles from "@/components/common/calendar/LabelCalendar.module.scss";
 interface LabelCalendarProps {
   label: string;
   required: boolean;
+  selectedDate: string | Date;
+  onDateChange?: Dispatch<SetStateAction<string | Date>>;
 }
 // required : true 면  날짜 선택
 // required : false 면  날짜 선택 불가
-function LabelCalendar({ label, required }: LabelCalendarProps) {
+function LabelCalendar({
+  label,
+  required,
+  selectedDate,
+  onDateChange,
+}: LabelCalendarProps) {
   const [date, setDate] = useState<Date>();
   return (
     <div className={styles.container}>
@@ -33,11 +40,15 @@ function LabelCalendar({ label, required }: LabelCalendarProps) {
             variant={"outline"}
             className={cn(
               "w-[200px] justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !selectedDate && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, "PPP") : <span>Pick a date</span>}
+            {selectedDate ? (
+              format(selectedDate, "PPP")
+            ) : (
+              <span>Pick a date</span>
+            )}
           </Button>
         </PopoverTrigger>
 
@@ -45,8 +56,8 @@ function LabelCalendar({ label, required }: LabelCalendarProps) {
           <PopoverContent className="w-auto p-0">
             <Calendar
               mode="single"
-              selected={date}
-              onSelect={setDate}
+              selected={selectedDate}
+              onSelect={onDateChange}
               initialFocus
             />
           </PopoverContent>
