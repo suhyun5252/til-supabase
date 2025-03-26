@@ -30,4 +30,9 @@
   font-size: 14px;
   font-weight: 500;
   color: #a6a6a6;
+}
+.container_todos_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }/*# sourceMappingURL=SideNavigation.module.css.map */
