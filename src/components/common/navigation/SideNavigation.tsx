@@ -1,16 +1,20 @@
 "use client";
 import { createTodo, getTodos, TodosRow } from "@/app/actions/todo-actions";
+import { sidebarStateAtom } from "@/app/store";
 // scss
 import styles from "@/components/common/navigation/SideNavigation.module.scss";
 // shadcn
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAtom } from "jotai";
 import { Dot, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function SideNavigation() {
+  // jotai
+  const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom);
   //  router
   const router = useRouter();
   const [todos, setTodos] = useState<TodosRow[] | null>([]);
@@ -38,6 +42,7 @@ function SideNavigation() {
     // 데이터 추가 성공시 할 일 등록창으로 이동시킴
     // http://localhost:3000/create/ [data.id] 로 이동
     console.log(data.id);
+
     router.push(`/create/${data.id}`);
   };
   // read
@@ -57,10 +62,16 @@ function SideNavigation() {
       duration: 3000,
     });
     setTodos(data);
+    setSidebarState("default");
   };
   useEffect(() => {
-    fetchgetTodos();
-  }, []);
+    if (sidebarState !== "default") {
+      fetchgetTodos();
+    }
+    if (sidebarState === "delete") {
+      router.push("/");
+    }
+  }, [sidebarState]);
   return (
     <div className={styles.container}>
       {/* 검색창 */}

@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { ChevronLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAtom } from "jotai";
+import { sidebarStateAtom } from "@/app/store";
 
 // contents 배열에 대한 타입 정의
 interface BoardContent {
@@ -34,6 +36,8 @@ interface BoardContent {
 }
 
 function Page() {
+  // jotai
+  const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom);
   const router = useRouter();
   const { id } = useParams();
   // 데이터 출력 state
@@ -51,14 +55,14 @@ function Page() {
     console.log(id, "Id 제거");
     const { error, status } = await deleteTodo(Number(id));
     if (!error) {
-      router.push("/");
+      setSidebarState("deletePage");
     }
   };
 
   // 타이틀 저장 함수
   const handleSaveTitle = async () => {
     console.log("타이틀 저장 함수", title);
-    const { data, error, state } = await updateTodoIdTitle(
+    const { data, error, status } = await updateTodoIdTitle(
       Number(id),
       title,
       startDate,
@@ -66,7 +70,9 @@ function Page() {
     );
     console.log(data);
     console.log(error);
-    console.log(state);
+    console.log(status);
+    // jptai 의 State 갱신
+    setSidebarState("titleChange");
   };
 
   // 컨텐츠 삭제 함수
@@ -178,6 +184,7 @@ function Page() {
   };
 
   useEffect(() => {
+    setSidebarState("createNew");
     fetchGetTodoId();
   }, []);
 
