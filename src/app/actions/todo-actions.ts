@@ -68,12 +68,21 @@ export async function updateTodoId(id: number, contents: string) {
 }
 
 // Title 업데이트 함수
-export async function updateTodoIdTitle(id: number, title: string) {
+export async function updateTodoIdTitle(
+  id: number,
+  title: string,
+  startDate: Date | undefined,
+  endDate: Date | undefined
+) {
   const supabase = await createServerSideClient();
 
   const { data, error, status } = await supabase
     .from("todos")
-    .update({ title: title })
+    .update({
+      title: title,
+      start_date: startDate?.toISOString(),
+      end_date: endDate?.toISOString(),
+    })
     .eq("id", id)
     .select()
     .single();

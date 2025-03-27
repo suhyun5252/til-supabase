@@ -42,6 +42,10 @@ function Page() {
   const [startDate, setStarDate] = useState<undefined | Date>(new Date());
   const [endDate, setEndDate] = useState<undefined | Date>(new Date());
 
+  const [totalCount, setTotalCount] = useState<number>(0);
+  // Progress Bar 처리
+  const [completedCount, setCompletedCount] = useState<number>(0);
+
   // page 삭제하기
   const handleDeletBoard = async () => {
     console.log(id, "Id 제거");
@@ -54,7 +58,12 @@ function Page() {
   // 타이틀 저장 함수
   const handleSaveTitle = async () => {
     console.log("타이틀 저장 함수", title);
-    const { data, error, state } = await updateTodoIdTitle(Number(id), title);
+    const { data, error, state } = await updateTodoIdTitle(
+      Number(id),
+      title,
+      startDate,
+      endDate
+    );
     console.log(data);
     console.log(error);
     console.log(state);
@@ -116,6 +125,16 @@ function Page() {
     setEndDate(data?.end_date ? new Date(data.end_date) : new Date());
     const temp = data?.contents ? JSON.parse(data.contents as string) : [];
     setContents(temp);
+    // 카운트
+    calcCompletedCount(temp);
+  };
+
+  // contents 의 isCompleted 가 true 인 갯수 파악하기
+  const calcCompletedCount = (temp: BoardContent[]) => {
+    const count = temp.filter((item) => item.isCompleted === true);
+    setCompletedCount(count.length);
+    setTotalCount((count.length / temp.length) * 100);
+    // console.log("completedCount : ", completedCount);
   };
 
   // 컨텐츠 추가하기
@@ -162,6 +181,10 @@ function Page() {
     fetchGetTodoId();
   }, []);
 
+  // useEffect(() => {
+  //   calcCompletedCount();
+  // }, [contents]);
+
   return (
     <div className={styles.container}>
       {/* board 메뉴 */}
@@ -192,10 +215,12 @@ function Page() {
           />
           {/* 진행율 */}
           <div className={styles.progressBar}>
-            <span className={styles.progressBar_status}>1/10 completed!</span>
+            <span className={styles.progressBar_status}>
+              {completedCount}/{contents.length} completed!
+            </span>
             {/* Progress 컴포넌트 배치 */}
             <Progress
-              value={33}
+              value={totalCount}
               className="w-[30%] h-2"
               indicateColor="bg-orange-500"
             />
@@ -207,11 +232,13 @@ function Page() {
                 label="From"
                 required={false}
                 selectedDate={startDate}
+                onDateChange={setStarDate}
               />
               <LabelCalendar
                 label="To"
-                required={true}
+                required={false}
                 selectedDate={endDate}
+                onDateChange={setEndDate}
               />
             </div>
             <Button
@@ -246,7 +273,7 @@ function Page() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-start w-full h-full gap-4">
+          <div className="flex flex-col items-center justify-start w-full h-full gap-4 overflow-y-auto">
             {contents.map((item) => (
               <BasicBoard
                 key={item.boardId}
