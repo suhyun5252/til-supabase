@@ -89,10 +89,17 @@ function SideNavigation() {
       <div className={styles.container_buttonBox}>
         <Button
           variant={"outline"}
-          className="w-full text-orange-500 border-orange-400 hover:bg-orange-50 hover:text-orange-500"
+          className="flex-1 text-orange-500 border-orange-400 cursor-pointer hover:bg-orange-50 hover:text-orange-500"
           onClick={onCreate}
         >
           Add New Page
+        </Button>
+        <Button
+          variant={"outline"}
+          className="flex-1 text-orange-500 border-orange-400 cursor-pointer hover:bg-orange-50 hover:text-orange-500"
+          onClick={() => router.push("/blog")}
+        >
+          Blog
         </Button>
       </div>
       {/* 추가 항목 출력 영역 */}

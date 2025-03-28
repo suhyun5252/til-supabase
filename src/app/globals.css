@@ -132,3 +132,73 @@
     height: 100%;
   }
 }
+
+.ProseMirror {
+  /* 기본 스타일 */
+  > * + * {
+    margin-top: 0.75em;
+  }
+
+  /* 헤딩 스타일 */
+  h1 {
+    font-size: 2em;
+    font-weight: bold;
+  }
+  h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+  }
+  h4 {
+    font-size: 1em;
+    font-weight: bold;
+  }
+  h5 {
+    font-size: 0.83em;
+    font-weight: bold;
+  }
+  h6 {
+    font-size: 0.67em;
+    font-weight: bold;
+  }
+
+  /* 리스트 스타일 */
+  ul,
+  ol {
+    padding: 0 1rem;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  /* 코드 블록 스타일 */
+  pre {
+    background: #0d0d0d;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+  }
+
+  code {
+    background: #00000010;
+    color: #616161;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+  }
+
+  /* 인용구 스타일 */
+  blockquote {
+    border-left: 2px solid #0070f3;
+    padding-left: 1rem;
+    margin-left: 0;
+    font-style: italic;
+  }
+}

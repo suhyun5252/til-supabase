@@ -1,0 +1,127 @@
+.itemBox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  height: 100%;
+}
+
+.toolbarBtn {
+  width: 30px;
+  height: 30px;
+  background-size: 26px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.toolbarBtn:not(:last-child) {
+  margin-right: 10px;
+}
+
+.none {
+  background-color: #ffffff !important;
+}
+
+.active {
+  background-color: #e7e7e7 !important;
+}
+
+.line {
+  width: 1px;
+  height: 25px;
+  margin: 0 15px;
+  background-color: #cacad6;
+}
+
+.h1 {
+  background-image: url("/editor_h1.svg");
+}
+
+.h2 {
+  background-image: url("/editor_h2.svg");
+}
+
+.h3 {
+  background-image: url("/editor_h3.svg");
+}
+
+.h4 {
+  background-image: url("/editor_h4.svg");
+}
+.h5 {
+  background-image: url("/editor_h5.svg");
+}
+
+.h6 {
+  background-image: url("/editor_h6.svg");
+}
+
+.bold {
+  background-image: url("/editor_bold.svg");
+}
+
+.italic {
+  background-image: url("/editor_italic.svg");
+}
+
+.underline {
+  background-image: url("/editor_underline.svg");
+}
+
+.strike {
+  background-image: url("/editor_strike.svg");
+}
+
+.bulleted {
+  background-size: 24px !important;
+  background-image: url("/editor_list_bulleted.svg");
+}
+
+.numbered {
+  background-size: 24px !important;
+  background-image: url("/editor_list_numbered.svg");
+}
+
+.link {
+  background-image: url("/editor_link.svg");
+}
+
+.image {
+  background-image: url("/editor_image.svg");
+}
+
+.newline {
+  background-image: url("/editor_line.svg");
+}
+
+.code {
+  background-image: url("/editor_code.svg");
+}
+
+.quote {
+  background-image: url("/editor_quote.svg");
+}
+
+.center {
+  background-image: url("/editor_center.svg");
+}
+.left {
+  background-image: url("/editor_left.svg");
+}
+.right {
+  background-image: url("/editor_right.svg");
+}
+.justify {
+  background-image: url("/editor_justify.svg");
+}
+
+.textColor {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 7h6l2 10H7L9 7Z'/%3E%3Cpath d='M3 17h18'/%3E%3C/svg%3E");
+}
+
+.backgroundColor {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19H5L3 17V7l2-2h7'/%3E%3Cpath d='M12 19h7l2-2V7l-2-2h-7'/%3E%3Cpath d='M8 12h8'/%3E%3Cpath d='M12 8v8'/%3E%3C/svg%3E");
+}
+
+.editor img {
+  display: inline !important;
+}
