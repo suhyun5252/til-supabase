@@ -1,8 +1,15 @@
 import { Editor } from "@tiptap/core";
 import React from "react";
 import { Icon } from "@/components/editor/icon";
+// 직접 만든 것으로 대체
+import AddPhoto from "@/components/editor/addbutton";
 
-const Toolbar = ({ editor }: { editor: Editor | null }) => {
+interface ToolbarProps {
+  editor: Editor | null;
+  onImageUpload?: (file: File) => Promise<string | null>;
+}
+
+const Toolbar = ({ editor, onImageUpload }: ToolbarProps) => {
   if (!editor) return null;
 
   return (
@@ -36,7 +43,9 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
           <Icon.Quote editor={editor} />
           <Icon.Code editor={editor} />
           <Icon.Link editor={editor} />
-          <Icon.AddPhoto editor={editor} />
+          {/* <Icon.AddPhoto editor={editor} /> */}
+          {/* 직접 만든 파일 업로드 함수로 전달 */}
+          <AddPhoto editor={editor} onImageUpload={onImageUpload} />
         </div>
       </div>
     </div>
