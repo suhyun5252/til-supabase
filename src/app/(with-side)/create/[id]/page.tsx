@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 // nanoid
 import { nanoid } from "nanoid";
 // scss
-import styles from "@/app/create/[id]/page.module.scss";
+import styles from "@/app/(with-side) /create/[id]/page.module.scss";
 // action
 import {
   deleteTodo,

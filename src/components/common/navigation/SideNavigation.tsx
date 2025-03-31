@@ -6,8 +6,9 @@ import styles from "@/components/common/navigation/SideNavigation.module.scss";
 // shadcn
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { signOut } from "@/lib/supabase/actions";
 import { useAtom } from "jotai";
-import { Dot, Search } from "lucide-react";
+import { Dot, LogOutIcon, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -72,6 +73,11 @@ function SideNavigation() {
       router.push("/");
     }
   }, [sidebarState]);
+
+  const fetchSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
   return (
     <div className={styles.container}>
       {/* 검색창 */}
@@ -104,9 +110,18 @@ function SideNavigation() {
       </div>
       {/* 추가 항목 출력 영역 */}
       <div className={styles.container_todos}>
-        <div className={styles.container_todos_label}>
+        <div
+          className={`${styles.container_todos_label} flex justify-between items-center`}
+        >
           {/* 로그아웃 버튼 배치 */}
-          {"홍길동"}님 YourTodo
+          <div>{"홍길동"}님 YourTodo</div>
+          <div>
+            <form action={fetchSignOut}>
+              <Button variant={"outline"} size={"icon"} type="submit">
+                <LogOutIcon />
+              </Button>
+            </form>
+          </div>
         </div>
         <div className={styles.container_todos_list}>
           {todos!.map((item) => (
