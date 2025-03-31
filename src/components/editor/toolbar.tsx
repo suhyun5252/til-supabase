@@ -9,7 +9,7 @@ interface ToolbarProps {
   onImageUpload?: (file: File) => Promise<string | null>;
 }
 
-const Toolbar = ({ editor, onImageUpload }: ToolbarPropss) => {
+const Toolbar = ({ editor, onImageUpload }: ToolbarProps) => {
   if (!editor) return null;
 
   return (

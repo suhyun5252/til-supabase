@@ -14,6 +14,7 @@ export default function AddPhoto({ editor, onImageUpload }: AddPhotoProps) {
     if (files === null || !editor) return;
 
     const file = files[0];
+    console.log("file", file);
 
     if (onImageUpload) {
       const imageUrl = await onImageUpload(file);
