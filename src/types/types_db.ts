@@ -15,18 +15,24 @@ export type Database = {
           created_at: string;
           id: number;
           title: string | null;
+          user_email: string;
+          user_id: string | null;
         };
         Insert: {
           content?: string | null;
           created_at?: string;
           id?: number;
           title?: string | null;
+          user_email: string;
+          user_id?: string | null;
         };
         Update: {
           content?: string | null;
           created_at?: string;
           id?: number;
           title?: string | null;
+          user_email?: string;
+          user_id?: string | null;
         };
         Relationships: [];
       };
@@ -37,6 +43,8 @@ export type Database = {
           id: number;
           start_date: string | null;
           title: string | null;
+          user_email: string | null;
+          user_id: string | null;
         };
         Insert: {
           contents?: Json | null;
@@ -44,6 +52,8 @@ export type Database = {
           id?: number;
           start_date?: string | null;
           title?: string | null;
+          user_email?: string | null;
+          user_id?: string | null;
         };
         Update: {
           contents?: Json | null;
@@ -51,6 +61,8 @@ export type Database = {
           id?: number;
           start_date?: string | null;
           title?: string | null;
+          user_email?: string | null;
+          user_id?: string | null;
         };
         Relationships: [];
       };

@@ -9,6 +9,19 @@ export type TodosRowUpdate = Database["public"]["Tables"]["todos"]["Update"];
 // Create 기능
 export async function createTodo(todo: TodosRowInsert) {
   const supabase = await createServerSideClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
+
   const { data, error, status } = await supabase
     .from("todos")
     .insert([
@@ -17,6 +30,8 @@ export async function createTodo(todo: TodosRowInsert) {
         contents: todo.contents,
         start_date: todo.start_date,
         end_date: todo.end_date,
+        user_id: user.id, // 로그인 사용자 정보
+        user_email: user.email, // 로그인 사용자 정보
       },
     ])
     .select()
@@ -27,9 +42,25 @@ export async function createTodo(todo: TodosRowInsert) {
 // Read 기능
 export async function getTodos() {
   const supabase = await createServerSideClient();
+
+  // 현재 로그인한 사용자 정보 가져오기
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
+
   const { data, error, status } = await supabase
     .from("todos")
     .select("*")
+    .eq("user_id", user.id) // 로그인 사용자 정보
     .order("id", { ascending: false });
   return { data, error, status } as {
     data: TodosRow[] | null;
@@ -40,10 +71,24 @@ export async function getTodos() {
 // Read 기능 id 한개
 export async function getTodoId(id: number) {
   const supabase = await createServerSideClient();
+  // 현재 로그인한 사용자 정보 가져오기
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
   const { data, error, status } = await supabase
     .from("todos")
     .select()
     .eq("id", id)
+    .eq("user_id", user.id) // 로그인 사용자 정보
     .single();
   return { data, error, status } as {
     data: TodosRow | null;
@@ -55,11 +100,25 @@ export async function getTodoId(id: number) {
 // Update 기능 id 한개
 export async function updateTodoId(id: number, contents: string) {
   const supabase = await createServerSideClient();
+  // 현재 로그인한 사용자 정보 가져오기
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
 
   const { data, error, status } = await supabase
     .from("todos")
     .update({ contents: contents })
     .eq("id", id)
+    .eq("user_id", user.id) // 로그인 사용자 정보
     .select()
     .single();
 
@@ -78,6 +137,19 @@ export async function updateTodoIdTitle(
   endDate: Date | undefined
 ) {
   const supabase = await createServerSideClient();
+  // 현재 로그인한 사용자 정보 가져오기
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
 
   const { data, error, status } = await supabase
     .from("todos")
@@ -87,6 +159,7 @@ export async function updateTodoIdTitle(
       end_date: endDate?.toISOString(),
     })
     .eq("id", id)
+    .eq("user_id", user.id) // 로그인 사용자 정보
     .select()
     .single();
 
@@ -100,7 +173,24 @@ export async function updateTodoIdTitle(
 // row 삭제 기능
 export async function deleteTodo(id: number) {
   const supabase = await createServerSideClient();
-  const { error, status } = await supabase.from("todos").delete().eq("id", id);
+  // 현재 로그인한 사용자 정보 가져오기
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      data: null,
+      error: userError || new Error("User not authenticated"),
+      status: 401,
+    };
+  }
+  const { error, status } = await supabase
+    .from("todos")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id); // 로그인 사용자 정보
 
   return { error, status } as {
     error: Error | null;
