@@ -12,8 +12,20 @@ import { Dot, LogOutIcon, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+// zustand
+import { useUserStore } from "@/app/store/userUserStore";
+import { User } from "@supabase/supabase-js";
 
-function SideNavigation() {
+function SideNavigation({ user }: { user: User | null }) {
+  console.log("user", user);
+  const { name, email, setUser } = useUserStore();
+  // zustand 업데이트
+  useEffect(() => {
+    if (user) {
+      setUser(user.user_metadata.full_name, user.email!, user.id);
+    }
+  }, []);
+
   // jotai
   const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom);
   //  router
@@ -114,7 +126,9 @@ function SideNavigation() {
           className={`${styles.container_todos_label} flex justify-between items-center`}
         >
           {/* 로그아웃 버튼 배치 */}
-          <div>{"홍길동"}님 YourTodo</div>
+          <div>
+            {name}님 YourTodo {email}
+          </div>
           <div>
             <form action={fetchSignOut}>
               <Button variant={"outline"} size={"icon"} type="submit">
