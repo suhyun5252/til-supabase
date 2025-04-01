@@ -25,10 +25,15 @@ const signInWith = (provider: Provider) => async () => {
   redirect(data.url as string);
 };
 
+// 구글
 const signInWithGoogle = signInWith("google");
+// 카카오
+const signInWithKakao = signInWith("kakao");
+
+// 로그아웃
 const signOut = async () => {
   const supabase = await createServerSideClient();
   await supabase.auth.signOut();
 };
 
-export { signInWithGoogle, signOut };
+export { signInWithGoogle, signOut, signInWithKakao };

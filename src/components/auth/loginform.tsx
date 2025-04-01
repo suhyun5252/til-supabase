@@ -1,6 +1,6 @@
 "use client";
 
-import { signInWithGoogle } from "@/lib/supabase/actions";
+import { signInWithGoogle, signInWithKakao } from "@/lib/supabase/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,6 +86,22 @@ export function LoginForm() {
     }
   };
 
+  const handleKakaoLogin = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithKakao();
+      toast.success("로그인 성공!", {
+        description: "메인 페이지로 이동합니다.",
+      });
+    } catch (error) {
+      toast.error("로그인 실패", {
+        description: "Kakao 로그인 중 오류가 발생했습니다.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
@@ -160,7 +176,7 @@ export function LoginForm() {
           variant="outline"
           type="button"
           className="w-full"
-          onClick={handleGoogleLogin}
+          onClick={handleKakaoLogin}
           disabled={isLoading}
         >
           Kakao로 계속하기
