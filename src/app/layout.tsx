@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import SideNavigation from "@/components/common/navigation/SideNavigation";
+// import SideNavigation from "@/components/common/navigation/SideNavigation";
 // shadcn/ui
 import { Toaster } from "@/components/ui/sonner";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -25,7 +26,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${roboto.variable}  antialiased`}>
         {/* <SideNavigation /> */}
-        {children}
+        <ReactQueryProvider>{children}</ReactQueryProvider>
         <Toaster />
       </body>
     </html>

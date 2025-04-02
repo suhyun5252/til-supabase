@@ -1,227 +1,487 @@
-# zustand
+# React Query
 
-- https://zustand.docs.pmnd.rs/getting-started/introduction
-- [상식] https://velog.io/@rinm/Jotai-Zustand
+- v3, v4, v5 각 버전의 사용법 및 설치법이 다름
+- 현재는 `v5`를 사용함
+- https://tanstack.com/query/v5
+- https://tanstack.com/query/v5/docs/framework/react/overview
+- https://velog.io/@kandy1002/React-Query-푹-찍어먹기
+
+## 1. 설치
+
+- 라이브러리
 
 ```bash
-npm install zustand --legacy-peer-deps
+npm install @tanstack/react-query --legacy-peer-deps
 ```
 
-## 기본 설정
+- DevTools 설치
 
-- 로그인 사용자 : 정보를 전역 보관한다.
-- 일반적으로 `/app/store 폴더`에 store 를 생성한다.
-- `/app/store/userUserStore.ts 파일`생성
-
-```ts
-import { create } from "zustand";
-
-interface UserState {
-  uid: string;
-  name: string;
-  email: string;
-  setUser: (user: UserState) => void;
-  //   setUser: (name: string, email: string, uid: string) => void;
-}
-export const useUserStore = create<UserState>((set) => ({
-  uid: "",
-  name: "",
-  email: "",
-  setUser: (user) => set(user),
-  //   setUser: (name, email, uid) => set({ name, email, uid }),
-}));
+```bash
+npm install @tanstack/react-query-devtools --legacy-peer-deps
 ```
 
-## 정보전달
+## 2. 개념
 
-- /app/(with-side)/layout.tsx
+- 데이터를 쉽게 가져오고, 자동으로 업데이트해 주는 도구 라이브러리
+- `fresh` 한 데이터 : 최신 데이터
+- `stale` 한 데이터 : 기존 데이터 (상해버린 데이터)
+- 서버 상태를 불러오고, 캐싱하고, 지속적으로 동기화하고 업데이트 도움 라이브러리
+- 캐싱기능과, Window Focus Refetching 기능 제공
 
-```tsx
-import SideNavigation from "@/components/common/navigation/SideNavigation";
-import { ReactNode } from "react";
-// Supabase Server Client
-import { createServerSideClient } from "@/lib/supabase/server";
+## 3. 환경설정
 
-export default async function Layout({ children }: { children: ReactNode }) {
-  // Client 컴포넌트에서 zustand 액션을 통해서 업데이트해도 됨
-  // Server 컴포넌트에서 zustand 액션을 통해서 업데이트해도 됨
-  const supabase = await createServerSideClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  console.log("session ", user);
+### 3.1. ReactQueryProvider 생성
 
-  return (
-    <>
-      <SideNavigation user={user} />
-      <div>{children}</div>
-    </>
-  );
-}
-```
-
-## 정보활용
-
-- /app/components/common/navigation/SideNavigation.tsx
+- 이 파일의 용도는 App 전체에서 React Query를 사용하기 위한 provider 역할
+- `/src/providers 폴더` 생성
+- `/src/providers/ReactQueryProvider.tsx 파일` 생성
 
 ```tsx
 "use client";
-import { createTodo, getTodos, TodosRow } from "@/app/actions/todo-actions";
-import { sidebarStateAtom } from "@/app/store";
-// scss
-import styles from "@/components/common/navigation/SideNavigation.module.scss";
-// shadcn
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { signOut } from "@/lib/supabase/actions";
-import { useAtom } from "jotai";
-import { Dot, LogOutIcon, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-// zustand
-import { useUserStore } from "@/app/store/userUserStore";
-import { User } from "@supabase/supabase-js";
 
-function SideNavigation({ user }: { user: User | null }) {
-  console.log("user", user);
-  const { name, email, setUser } = useUserStore();
-  // zustand 업데이트
-  useEffect(() => {
-    if (user) {
-      setUser(user.user_metadata.full_name, user.email!, user.id);
-    }
-  }, []);
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// 개발자 도구
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-  // jotai
-  const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom);
-  //  router
-  const router = useRouter();
-  const [todos, setTodos] = useState<TodosRow[] | null>([]);
-  // create
-  const onCreate = async () => {
-    const { data, error, status } = await createTodo({
-      title: "",
-      contents: JSON.stringify([]),
-      start_date: new Date().toISOString(),
-      end_date: new Date().toISOString(),
-    });
-    // 에러 발생시
-    if (error) {
-      toast.error("데이터 생성 실패", {
-        description: `데이터 생성에 실패하였습니다. ${error.message}`,
-        duration: 3000,
-      });
-      return;
-    }
-    // 성공시
-    toast.success("데이터 생성 성공", {
-      description: `데이터 생성에 성공하였습니다.`,
-      duration: 3000,
-    });
-    // 데이터 추가 성공시 할 일 등록창으로 이동시킴
-    // http://localhost:3000/create/ [data.id] 로 이동
-    console.log(data.id);
+export const queryClient = new QueryClient();
 
-    router.push(`/create/${data.id}`);
-  };
-  // read
-  const fetchgetTodos = async () => {
-    const { data, error, status } = await getTodos();
-    // 에러발생시
-    if (error) {
-      toast.error("데이터조회실패", {
-        description: `데이터조회에 실패하였습니다. ${error.message}`,
-        duration: 3000,
-      });
-      return;
-    }
-    // 최종 데이터
-    toast.success("데이터조회성공", {
-      description: `데이터조회에 성공하였습니다.`,
-      duration: 3000,
-    });
-    setTodos(data);
-    setSidebarState("default");
-  };
-  useEffect(() => {
-    if (sidebarState !== "default") {
-      fetchgetTodos();
-    }
-    if (sidebarState === "delete") {
-      router.push("/");
-    }
-  }, [sidebarState]);
-
-  const fetchSignOut = async () => {
-    await signOut();
-    router.push("/");
-  };
+export default function ReactQueryProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className={styles.container}>
-      {/* 검색창 */}
-      <div className={styles.container_searchBox}>
-        <Input
-          type="text"
-          placeholder="검색어를 입력하세요."
-          className="focus-visible:right"
-        />
-        <Button variant={"outline"} size={"icon"}>
-          <Search className="w-4 h-4" />
-        </Button>
-      </div>
-      {/* page 추가 버튼 */}
-      <div className={styles.container_buttonBox}>
-        <Button
-          variant={"outline"}
-          className="flex-1 text-orange-500 border-orange-400 cursor-pointer hover:bg-orange-50 hover:text-orange-500"
-          onClick={onCreate}
-        >
-          Add New Page
-        </Button>
-        <Button
-          variant={"outline"}
-          className="flex-1 text-orange-500 border-orange-400 cursor-pointer hover:bg-orange-50 hover:text-orange-500"
-          onClick={() => router.push("/blog")}
-        >
-          Blog
-        </Button>
-      </div>
-      {/* 추가 항목 출력 영역 */}
-      <div className={styles.container_todos}>
-        <div
-          className={`${styles.container_todos_label} flex justify-between items-center`}
-        >
-          {/* 로그아웃 버튼 배치 */}
-          <div>
-            {name}님 YourTodo {email}
-          </div>
-          <div>
-            <form action={fetchSignOut}>
-              <Button variant={"outline"} size={"icon"} type="submit">
-                <LogOutIcon />
-              </Button>
-            </form>
-          </div>
-        </div>
-        <div className={styles.container_todos_list}>
-          {todos!.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center py-2 bg-[#f5f5f4] rounded-sm cursor-pointer"
-              onClick={() => router.push(`/create/${item.id}`)}
-            >
-              <Dot className="mr-1 text-green-400 " />
-              <span className="text-sm">
-                {item.title ? item.title : "No Title"}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      {/* Dev Tool : React Query DevTools 를 셋팅 */}
+      <ReactQueryDevtools initialIsOpen={false} position="bottom" />
+    </QueryClientProvider>
   );
 }
+```
 
-export default SideNavigation;
+### 3.2 ReactQueryProvider 적용
+
+- 앱 전체에서 활용할 것이므로
+- `/src/app/layout.tsx` 파일에 적용
+
+```tsx
+import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
+import "./globals.css";
+// import SideNavigation from "@/components/common/navigation/SideNavigation";
+// shadcn/ui
+import { Toaster } from "@/components/ui/sonner";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
+
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+export const metadata: Metadata = {
+  title: "Todo",
+  description: "Todo Supabase",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ko">
+      <body className={`${roboto.variable}  antialiased`}>
+        {/* <SideNavigation /> */}
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Toaster />
+      </body>
+    </html>
+  );
+}
+```
+
+## 4. 기능 살펴보기 라우터 구성
+
+- 간단한 Todo 로 실습
+
+### 4.1 Server Action 생성
+
+- `/src/app/actions/test-action.ts 파일` 생성
+
+```ts
+"use server";
+const TODOS: string[] = [];
+// 할일 목록 가져오기
+export const getTodos = async (): Promise<string[]> => {
+  // 일부러 서버 지연된것 처럼 1초 대기
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return TODOS;
+};
+
+// 할일 목록 추가하기
+export const createTodos = async (data: string): Promise<string[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // 새로운 todo 를 추가해서
+  TODOS.push(data);
+  return TODOS;
+};
+```
+
+### 4.2 test 라우터로 생성
+
+- http://localhost:3000/test 접근
+- /src/app/test 폴더
+- /src/app/test/page.tsx 파일생성
+
+```tsx
+import React from "react";
+
+const page = () => {
+  return (
+    <div>
+      <h1>Test Todo</h1>
+    </div>
+  );
+};
+
+export default page;
+```
+
+## 5. useQuery() 살펴보기 (데이터 가져오기)
+
+- /src/app/test/page.tsx
+
+```tsx
+"use client";
+import { useQuery } from "@tanstack/react-query";
+import React from "react";
+import { getTodos } from "@/app/actions/test-action";
+
+const Page = () => {
+  const { data, isLoading, error, refetch } = useQuery({
+    // 데이터 가져오기
+    queryKey: ["uniq"],
+    queryFn: getTodos,
+  });
+  return (
+    <div>
+      <h1>Test Todo</h1>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {data && (
+        <div>
+          {data.map((item, index) => (
+            <div key={index}>{item}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Page;
+```
+
+### 5.1 옵션 설명
+
+```tsx
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+});
+```
+
+- `queryKey`
+  - 데이터를 식별하는 고유 키, 구분자 역할.
+  - 이름이 중복되어도 요청은 한 번만 하므로 의미없는 API 호출을 방지.
+  - userId 가 1 이라는 값이라면? ["uniq", 1]
+  - userId 가 2 이라는 값이라면? ["uniq", 2]
+  - 각 사용자 별 목록을 별도로 관리 가능
+- `const { data, isLoading, error, refetch, isFetching }`
+  - data : 가져온 데이터 (성공하면 데이터 저장됨)
+  - isLoading : 데이터 가져오는 중인지 여부 (true/false)
+  - error : 에러 발생 시 에러 정보가 담겨있음
+  - refetch : 데이터 새로고침 함수
+  - `<button onClick={() => refetch()}>다시 호출</button>`
+  - isFetching : 데이터 가져오는 중인지 여부 (true/false)
+
+```tsx
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq", userId],
+  queryFn: getTodos,
+});
+```
+
+### 5.2 staleTime 옵션
+
+- 일정한 시간만큼 새로운 데이터를 가져오지 않는다.
+- 일정한 시간만큼 캐싱이 되어 있는 데이터를 사용한다.
+
+```tsx
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq", userId],
+  queryFn: getTodos,
+  staleTime: 5000,
+});
+```
+
+### 5.3 refetchInterval 옵션
+
+- 일정한 시간만큼 새로운 데이터를 다시 가져옴.
+
+```tsx
+// 데이터 가져오기
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  refetchInterval: 5000,
+});
+```
+
+### 5.4 enabled 옵션
+
+- 조건에 따라서 true인 경우 데이터를 가져온다.
+
+```tsx
+// 데이터 가져오기
+const [isEnabled, setIsEnabled] = useState<boolean>(false);
+
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  enabled: isEnabled,
+});
+```
+
+### 5.5 refetchOnWindowFocus 옵션
+
+- 웹브라우저 윈도가 포커스 되는 경우 데이터 새로고침 여부.
+
+```tsx
+const { data, isLoading, error, refetch, isFetching } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  refetchOnWindowFocus: true,
+});
+```
+
+### 5.6 refetchOnMount 옵션
+
+- 컴포넌트가 마운트 되는 경우 데이터 새로고침 여부.
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  refetchOnMount: true,
+});
+```
+
+### 5.7 refetchOnReconnect 옵션
+
+- 네트워크가 다시 연결될 때 데이터 새로고침
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  refetchOnReconnect: true,
+});
+```
+
+### 5.8 refetchIntervalInBackground 옵션
+
+- 배경에서 데이터를 새로고침 여부
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  refetchIntervalInBackground: true,
+});
+```
+
+### 5.9 gcTime 옵션
+
+- 데이터를 캐시에 보관하는 시간
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  gcTime: 1000 * 60 * 5,
+});
+```
+
+### 5.10 retry 옵션
+
+- 데이터를 가져오다가 실패한 경우 몇 번 더 재실행 할 것인지
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  retry: 3,
+});
+```
+
+### 5.11 retryDelay 옵션
+
+- 재실행 대기시간
+
+```tsx
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ["uniq"],
+  queryFn: getTodos,
+  retry: 3,
+  retryDelay: 3000,
+});
+```
+
+## 6. useMutation() 살펴보기 (데이터 추가, 수정, 삭제)
+
+- 데이터를 생성, 수정, 삭제 등의 작업을 처리함
+- 데이터를 변경하는 작업
+- isLoading , isError, isSuccess 등으로 상태관리(점찍으면 나옴)
+- mutation.mutate(데이터) : 데이터를 서버로 보내는 경우
+  - `onClick={() => mutation.mutate()}`
+- mutation.data : 성공시 반환되는 데이터
+- mutation.isLoading : 서버 작업 요청 중이면 true
+- mutation.isError : 서버 작업 실패시 true
+- mutation.isSuccess : 서버 작업 성공시 true
+- mutation.isPending : 서버 작업 요청 중이면 true
+
+```tsx
+"use client";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { createTodos, getTodos } from "@/app/actions/test-action";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const Page = () => {
+  const [testInput, setTestInput] = useState<string>("");
+  // 데이터 가져오기
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["uniq"],
+    queryFn: getTodos,
+    retry: 3,
+    retryDelay: 3000,
+  });
+  // 데이터 추가하기
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      if (testInput.trim() === "") {
+        alert("할일을 등록해주세요.");
+        return;
+      }
+      await createTodos(testInput);
+    },
+    onSuccess: () => {
+      setTestInput("");
+      refetch();
+    },
+    onError: (error) => {
+      console.log("Error : 데이터 추가 실패함.");
+      console.log(error.message);
+    },
+  });
+  return (
+    <div>
+      <h1>Test Todo</h1>
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          value={testInput}
+          onChange={(e) => setTestInput(e.target.value)}
+        />
+        <Button
+          disabled={createMutation.isPending}
+          onClick={() => createMutation.mutate()}
+        >
+          {createMutation.isPending ? "추가중 ..." : "할일 추가"}
+        </Button>
+      </div>
+      <div>
+        <button onClick={() => refetch()}>다시 호출</button>
+      </div>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {data && (
+        <div>
+          {data.map((item, index) => (
+            <div key={index}>{item}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Page;
+```
+
+### 6.1 onSuccess : 성공 후 실행될 함수
+
+```tsx
+// 데이터 추가하기
+const createMutaion = useMutation({
+  onSuccess: () => {
+    setTestInput("");
+    refetch();
+  },
+});
+```
+
+### 6.2 onError : 실패 후 실행될 함수
+
+```tsx
+// 데이터 추가하기
+const createMutaion = useMutation({
+  onError: (error) => {
+    console.log("Error : 데이터 추가 실패함.");
+    console.log(error.message);
+  },
+});
+```
+
+### 6.3 onSettled : 성공 실패 상관없이 실행될 함수
+
+```tsx
+// 데이터 추가하기
+const createMutaion = useMutation({
+  onSettled: () => {
+    console.log("성공 실패 상관없이 실행됨.");
+  },
+});
+```
+
+### 6.4 mutateAsync : 비동기 처리
+
+```tsx
+// mutateAsync 비동기 실행 예제
+const mutation = useMutation({
+  mutationFn: createTodos,
+});
+const handleAdd = async () => {
+  try {
+    const now = await mutation.mutateAsync("추가요");
+    console.log("now", now);
+    queryClient.refetchQueries({ queryKey: ["uniq"] });
+  } catch (error) {
+    console.log(error);
+  }
+};
+```
+
+```tsx
+<Button
+  onClick={() => {
+    handleAdd();
+  }}
+>
+  비동기 실행
+</Button>
 ```
